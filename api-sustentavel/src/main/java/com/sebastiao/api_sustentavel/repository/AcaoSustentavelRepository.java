@@ -8,7 +8,6 @@ import java.util.List;
 public interface AcaoSustentavelRepository
         extends JpaRepository<AcaoSustentavel, Long> {
 
-    // Método que o service está chamando:
     List<AcaoSustentavel> findByCategoria(CategoriaAcao categoria);
 
 

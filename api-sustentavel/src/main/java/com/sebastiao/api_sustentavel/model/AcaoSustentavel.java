@@ -19,10 +19,9 @@ public class AcaoSustentavel {
     private LocalDate dataRealizacao;
     private String responsavel;
 
-    // Construtor vazio (necessário para JPA)
+
     public AcaoSustentavel() { }
 
-    // ✨ Construtor com todos os campos (menos o ID, pois ele é gerado)
     public AcaoSustentavel(String titulo,
                            String descricao,
                            CategoriaAcao categoria,
@@ -35,7 +34,6 @@ public class AcaoSustentavel {
         this.responsavel = responsavel;
     }
 
-    // Getters e setters...
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
     public String getTitulo() { return titulo; }

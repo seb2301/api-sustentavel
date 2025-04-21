@@ -69,9 +69,7 @@ public class AcaoSustentavelService {
         repository.deleteById(id);
     }
 
-    // ==========================
-    // Métodos auxiliares
-    // ==========================
+
 
     private AcaoSustentavel toEntity(AcaoSustentavelRequest request) {
         AcaoSustentavel acao = new AcaoSustentavel();
