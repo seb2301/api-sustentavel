@@ -1,49 +1,49 @@
 package com.sebastiao.api_sustentavel.controller;
 
-import com.sebastiao.api_sustentavel.dto.AcaoSustentavelRequest;
-import com.sebastiao.api_sustentavel.dto.AcaoSustentavelResponse;
-import com.sebastiao.api_sustentavel.model.CategoriaAcao;
+import com.sebastiao.api_sustentavel.response.AcaoSustentavelResponse;
 import com.sebastiao.api_sustentavel.service.AcaoSustentavelService;
-import jakarta.validation.Valid;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
 @RestController
-@RequestMapping("/acoes")
+@RequestMapping("/api/acoes-sustentaveis")
 public class AcaoSustentavelController {
 
     private final AcaoSustentavelService service;
 
+    @Autowired
     public AcaoSustentavelController(AcaoSustentavelService service) {
         this.service = service;
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping
     public List<AcaoSustentavelResponse> listar() {
         return service.listar();
     }
 
+    @PreAuthorize("hasRole('USER') or hasRole('ADMIN')")
     @GetMapping("/{id}")
     public AcaoSustentavelResponse buscarPorId(@PathVariable Long id) {
         return service.buscarPorId(id);
     }
 
-    @GetMapping("/categoria")
-    public List<AcaoSustentavelResponse> filtrarPorCategoria(@RequestParam CategoriaAcao tipo) {
-        return service.buscarPorCategoria(tipo);
-    }
-
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
-    public AcaoSustentavelResponse criar(@RequestBody @Valid AcaoSustentavelRequest request) {
-        return service.criar(request);
+    public AcaoSustentavelResponse cadastrar(@RequestBody AcaoSustentavelResponse request) {
+        return service.cadastrar(request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{id}")
-    public AcaoSustentavelResponse atualizar(@PathVariable Long id, @RequestBody @Valid AcaoSustentavelRequest request) {
+    public AcaoSustentavelResponse atualizar(@PathVariable Long id, @RequestBody AcaoSustentavelResponse request) {
         return service.atualizar(id, request);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{id}")
     public void deletar(@PathVariable Long id) {
         service.deletar(id);

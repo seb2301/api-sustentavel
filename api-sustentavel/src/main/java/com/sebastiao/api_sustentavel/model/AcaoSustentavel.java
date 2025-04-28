@@ -46,4 +46,8 @@ public class AcaoSustentavel {
     public void setDataRealizacao(LocalDate dataRealizacao) { this.dataRealizacao = dataRealizacao; }
     public String getResponsavel() { return responsavel; }
     public void setResponsavel(String responsavel) { this.responsavel = responsavel; }
+
+    public String getLocal() {
+        return "";
+    }
 }
