@@ -20,6 +20,13 @@ import org.springframework.http.HttpStatus;
 @EnableMethodSecurity(prePostEnabled = true) // Libera uso de @PreAuthorize
 public class SecurityConfig {
 
+    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+
+    public SecurityConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
+        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+    }
+
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
@@ -30,6 +37,10 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
                         .anyRequest().authenticated()
+                )
+                .exceptionHandling(ex -> ex
+                                .authenticationEntryPoint(customAuthenticationEntryPoint)
+
                 )
                 .httpBasic(httpBasic -> {}) // Usa autenticação básica
                 .exceptionHandling(exception -> exception
