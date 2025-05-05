@@ -22,28 +22,26 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
 
-        // Obter o token do cabeçalho Authorization
+
         String authorizationHeader = request.getHeader("Authorization");
 
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
             String token = authorizationHeader.substring(7); // Extrair o token (removendo "Bearer ")
 
             try {
-                // Validar o token e obter o nome do usuário
+
                 String username = jwtUtil.extractUsername(token);
 
                 if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-                    // Validar se o token não expirou
+
                     if (jwtUtil.isTokenExpired(token)) {
                         throw new ExpiredJwtException(null, null, "Token expirado");
                     }
 
-                    // Criar um objeto de autenticação para o usuário
                     UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
                             username, null, null // Definir as authorities conforme necessidade
                     );
 
-                    // Configurar a autenticação no contexto de segurança
                     SecurityContextHolder.getContext().setAuthentication(authentication);
                 }
             } catch (ExpiredJwtException ex) {
@@ -55,7 +53,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             }
         }
 
-        // Seguir com a cadeia de filtros
         filterChain.doFilter(request, response);
     }
 }

@@ -28,18 +28,18 @@ public class AuthenticationController {
     @PostMapping("/login")
     public ResponseEntity<AuthenticationResponse> login(@RequestBody @Valid AuthenticationRequest authenticationRequest) {
 
-        // Valida as credenciais do usuário
+
         try {
             authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(authenticationRequest.getUsername(), authenticationRequest.getPassword())
             );
         } catch (Exception e) {
-            return ResponseEntity.status(401).build(); // 401 Unauthorized
+            return ResponseEntity.status(401).build();
         }
 
-        // Se as credenciais forem válidas, gerar o token JWT
+
         final String token = jwtUtil.generateToken(authenticationRequest.getUsername());
 
-        return ResponseEntity.ok(new AuthenticationResponse(token)); // Retorna o token gerado
+        return ResponseEntity.ok(new AuthenticationResponse(token));
     }
 }

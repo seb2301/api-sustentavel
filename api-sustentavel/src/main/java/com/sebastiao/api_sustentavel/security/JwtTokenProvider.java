@@ -8,7 +8,7 @@ import java.util.Date;
 @Component
 public class JwtTokenProvider {
 
-    private final String jwtSecret = "secreta_chave"; // Troque por algo mais seguro
+    private final String jwtSecret = "secreta_chave";
 
     public String generateToken(String username) {
         return Jwts.builder()

@@ -26,7 +26,7 @@ public class AcaoSustentavelRequest {
     @NotBlank
     private String responsavel;
 
-    // Getters e Setters
+
 
     public String getTitulo() {
         return titulo;

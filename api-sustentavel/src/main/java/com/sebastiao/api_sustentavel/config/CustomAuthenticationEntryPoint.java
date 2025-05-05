@@ -16,9 +16,7 @@ public class CustomAuthenticationEntryPoint implements AuthenticationEntryPoint 
     public void commence(HttpServletRequest request,
                          HttpServletResponse response,
                          AuthenticationException authException) throws IOException {
-        // Define status 401
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        // Define corpo da resposta
         response.getWriter().write("Erro 401: Autenticação necessária para acessar este recurso.");
     }
 }

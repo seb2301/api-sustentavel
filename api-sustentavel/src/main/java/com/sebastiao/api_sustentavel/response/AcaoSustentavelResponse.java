@@ -8,11 +8,11 @@ public class AcaoSustentavelResponse {
     private String categoria;
     private String local;
 
-    // Construtor vazio
+
     public AcaoSustentavelResponse() {
     }
 
-    // Construtor cheio
+
     public AcaoSustentavelResponse(Long id, String titulo, String descricao, String categoria, String local) {
         this.id = id;
         this.titulo = titulo;
@@ -21,7 +21,7 @@ public class AcaoSustentavelResponse {
         this.local = local;
     }
 
-    // Getters e Setters
+
     public Long getId() {
         return id;
     }

@@ -8,7 +8,7 @@ public class AuthenticationResponse {
         this.token = token;
     }
 
-    // Getters and Setters
+
     public String getToken() {
         return token;
     }

@@ -20,7 +20,7 @@ import org.springframework.http.HttpStatus;
 
 @Configuration
 @EnableWebSecurity
-@EnableMethodSecurity(prePostEnabled = true) // Libera o uso de @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtUtil jwtUtil;
@@ -34,18 +34,18 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desabilita CSRF para APIs REST
+                .csrf(csrf -> csrf.disable())
                 .authorizeRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
-                        .requestMatchers("/com/sebastiao/api_sustentavel/auth/login").permitAll() // Permite acesso ao login sem autenticação
-                        .anyRequest().authenticated() // Qualquer outra requisição precisa de autenticação
+                        .requestMatchers("/com/sebastiao/api_sustentavel/auth/login").permitAll()
+                        .anyRequest().authenticated()
                 )
                 .exceptionHandling(ex -> ex
-                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // Retorna 401 não autenticado
-                        .accessDeniedHandler(accessDeniedHandler()) // Handler para 403
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED))
+                        .accessDeniedHandler(accessDeniedHandler())
                 )
                 .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Adiciona o filtro JWT
 
@@ -56,13 +56,13 @@ public class SecurityConfig {
     public UserDetailsService userDetailsService() {
         UserDetails user = User.builder()
                 .username("user")
-                .password("{noop}user123") // {noop} = sem criptografia (só para desenvolvimento!)
+                .password("{noop}user123")
                 .roles("USER")
                 .build();
 
         UserDetails admin = User.builder()
                 .username("admin")
-                .password("{noop}admin123") // {noop} = sem criptografia
+                .password("{noop}admin123")
                 .roles("ADMIN")
                 .build();
 
@@ -71,7 +71,7 @@ public class SecurityConfig {
 
     @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        // Retorna 403 se o usuário não tiver permissão
+
         return (request, response, accessDeniedException) -> {
             response.sendError(HttpStatus.FORBIDDEN.value(), "Acesso negado!");
         };
