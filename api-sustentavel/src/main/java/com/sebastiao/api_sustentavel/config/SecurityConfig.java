@@ -1,52 +1,53 @@
 package com.sebastiao.api_sustentavel.config;
 
+import com.sebastiao.api_sustentavel.security.JwtAuthenticationFilter;
+import com.sebastiao.api_sustentavel.security.JwtUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.access.AccessDeniedHandler;
-import org.springframework.security.web.AuthenticationEntryPoint;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
-import org.springframework.security.web.access.AccessDeniedHandlerImpl;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.http.HttpStatus;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // Libera uso de @PreAuthorize
+@EnableWebSecurity
+@EnableMethodSecurity(prePostEnabled = true) // Libera o uso de @PreAuthorize
 public class SecurityConfig {
 
-    private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
+    private final JwtUtil jwtUtil;
+    private final JwtAuthenticationFilter jwtAuthenticationFilter;
 
-    public SecurityConfig(CustomAuthenticationEntryPoint customAuthenticationEntryPoint) {
-        this.customAuthenticationEntryPoint = customAuthenticationEntryPoint;
+    public SecurityConfig(JwtUtil jwtUtil, JwtAuthenticationFilter jwtAuthenticationFilter) {
+        this.jwtUtil = jwtUtil;
+        this.jwtAuthenticationFilter = jwtAuthenticationFilter;
     }
-
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(csrf -> csrf.disable()) // Desabilita CSRF para APIs (recomendado em APIs REST)
-                .authorizeHttpRequests(auth -> auth
+                .csrf(csrf -> csrf.disable()) // Desabilita CSRF para APIs REST
+                .authorizeRequests(auth -> auth
                         .requestMatchers(HttpMethod.GET, "/api/**").hasAnyRole("USER", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
+                        .requestMatchers("/com/sebastiao/api_sustentavel/auth/login").permitAll() // Permite acesso ao login sem autenticação
+                        .anyRequest().authenticated() // Qualquer outra requisição precisa de autenticação
                 )
                 .exceptionHandling(ex -> ex
-                                .authenticationEntryPoint(customAuthenticationEntryPoint)
-
-                )
-                .httpBasic(httpBasic -> {}) // Usa autenticação básica
-                .exceptionHandling(exception -> exception
-                        .authenticationEntryPoint(authenticationEntryPoint()) // Handler para 401
+                        .authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)) // Retorna 401 não autenticado
                         .accessDeniedHandler(accessDeniedHandler()) // Handler para 403
-                );
+                )
+                .addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class); // Adiciona o filtro JWT
 
         return http.build();
     }
@@ -69,15 +70,10 @@ public class SecurityConfig {
     }
 
     @Bean
-    public AuthenticationEntryPoint authenticationEntryPoint() {
-        // Retorna 401 Unauthorized se não estiver logado
-        return new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED);
-    }
-
-    @Bean
     public AccessDeniedHandler accessDeniedHandler() {
-        AccessDeniedHandlerImpl accessDeniedHandler = new AccessDeniedHandlerImpl();
-        accessDeniedHandler.setErrorPage(null); // Não redireciona, apenas resposta 403
-        return accessDeniedHandler;
+        // Retorna 403 se o usuário não tiver permissão
+        return (request, response, accessDeniedException) -> {
+            response.sendError(HttpStatus.FORBIDDEN.value(), "Acesso negado!");
+        };
     }
 }
